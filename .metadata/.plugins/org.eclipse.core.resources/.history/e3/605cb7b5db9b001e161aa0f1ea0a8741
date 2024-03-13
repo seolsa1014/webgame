@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+    
+    <div class="title">
+        <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+    </div>
+    <div class="announcement">
+        <p>You are the king of a kingdom. Every day, you must make decisions to resolve various events by choosing one of the options. You have three resources: <span style="color: rgb(252, 224, 64);">Gold</span>,  <span style="color:rgb(218, 142, 1);">Food</span>, and <span style="color:  rgb(2, 2, 105);">soldiers</span>. If <span style="color: rgb(2, 108, 2);">Happiness</span> reaches 0, the game is over. Try to survive for 30 days!</p>
+    </div>
+    <div class="buttons">
+        <button class="button" onclick="goToMain()">Back</button>
+    </div>
+
+    <script>
+        function goToMain() {
+            window.location.href = 'main.jsp';
+        }
+    </script>
+
+</body>
+</html>

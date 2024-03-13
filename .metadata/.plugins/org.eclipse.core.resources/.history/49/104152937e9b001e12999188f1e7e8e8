@@ -1,0 +1,65 @@
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Random" %>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.io.*,java.util.*" %>
+<%@ page import="java.sql.*" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+<%
+    // ...
+
+    // Define the method directly inside a scriptlet
+    JSONArray generateRandomSequenceArray() {
+        JSONArray sequenceArray = new JSONArray();
+        ArrayList<Integer> sequenceList = new ArrayList<>();
+
+        // Generate a list of numbers from 1 to 30
+        for (int i = 1; i <= 30; i++) {
+            sequenceList.add(i);
+        }
+
+        // Shuffle the list
+        Random rand = new Random();
+        for (int i = 0; i < 30; i++) {
+            int randomIndex = rand.nextInt(sequenceList.size());
+            sequenceArray.add(sequenceList.remove(randomIndex));
+        }
+
+        return sequenceArray;
+    }
+
+    // ...
+%>
+
+<div class="title">
+    <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+</div>
+
+<div class="buttons">
+    <form method="post" action="createAccount.jsp">
+        <div class="field">
+            <b>Name</b><br>
+            <span class="placehold-text"><input type="text" name="name" required></span>
+        </div>
+
+        <button type="submit" class="button">Submit</button>
+        <button type="button" class="button" onclick="goToMain()">Back</button>
+    </form>
+</div>
+
+<%
+    // ...
+%>
+
+</body>
+</html>
+

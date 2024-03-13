@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+    
+    <div class="title">
+        <h1>You did not survive</h1>
+    </div>
+
+    <div class="buttons">
+        <button class="button" onclick="startNewGame()">go to main</button>
+    
+    </div>
+
+    <script>
+        function startNewGame() {
+            window.location.href = 'lobby.jsp';
+        }
+
+       
+    </script>
+
+</body>
+</html>

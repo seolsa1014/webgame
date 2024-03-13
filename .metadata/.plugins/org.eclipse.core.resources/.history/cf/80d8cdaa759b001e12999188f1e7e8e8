@@ -1,0 +1,67 @@
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Random;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+@WebServlet("/createAccount")
+public class CreateAccountServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String name = request.getParameter("name");
+
+        // 랜덤 시퀀스 배열 생성
+        JSONArray sequenceArray = generateRandomSequenceArray();
+
+        // 데이터베이스 연결 및 삽입
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/yourdatabase", "root", "690505");
+
+            String insertQuery = "INSERT INTO users (name, sequence, date, gold, food, soldiers, happiness, ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) VALUES (?, ?, 1, 15, 15, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+                pstmt.setString(1, name);
+                pstmt.setString(2, sequenceArray.toJSONString());
+                pstmt.executeUpdate();
+            }
+
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // 다음 페이지로 리다이렉트 (실제 다음 페이지로 바꿔주세요)
+        response.sendRedirect("lobby.jsp");
+    }
+
+    private JSONArray generateRandomSequenceArray() {
+        JSONArray sequenceArray = new JSONArray();
+        ArrayList<Integer> sequenceList = new ArrayList<>();
+
+        // 1부터 30까지의 숫자 목록 생성
+        for (int i = 1; i <= 30; i++) {
+            sequenceList.add(i);
+        }
+
+        // 목록 섞기
+        Random rand = new Random();
+        for (int i = 0; i < 30; i++) {
+            int randomIndex = rand.nextInt(sequenceList.size());
+            sequenceArray.add(sequenceList.remove(randomIndex));
+        }
+
+        return sequenceArray;
+    }
+}

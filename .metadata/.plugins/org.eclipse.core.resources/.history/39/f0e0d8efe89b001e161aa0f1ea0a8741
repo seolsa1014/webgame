@@ -1,0 +1,110 @@
+<%@ page import="java.sql.*, java.io.*, java.util.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Castle Page</title>
+    <link rel="stylesheet" type="text/css" href="css/day.css">
+</head>
+<body>
+
+<div class="header">
+    <h1>Day</h1>
+</div>
+
+<%
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    ResultSet rs = null;
+
+    int gold = 0;
+    int food = 0;
+    int soldiers = 0;
+    int happiness = 0;
+
+    try {
+        // Establish database connection
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+        // Get name from login table where id is 1
+        String loginQuery = "SELECT name FROM login WHERE id = 1";
+        pstmt = conn.prepareStatement(loginQuery);
+        rs = pstmt.executeQuery();
+
+        String nameFromLogin = null;
+
+        if (rs.next()) {
+            // Get the name from login table
+            nameFromLogin = rs.getString("name");
+
+            // Output the name to the browser console
+            %>
+            <script>
+                console.log("Name from loginddd table: <%= nameFromLogin %>");
+            </script>
+            <%
+        }
+
+        // Execute query to get data using name from login table
+        String userQuery = "SELECT gold, food, soldiers, happiness FROM your_table WHERE name = ?";
+        pstmt = conn.prepareStatement(userQuery);
+        pstmt.setString(1, nameFromLogin);
+        rs = pstmt.executeQuery();
+
+        // Process the result set and set variables
+        if (rs.next()) {
+            gold = rs.getInt("gold");
+            food = rs.getInt("food");
+            soldiers = rs.getInt("soldiers");
+            happiness = rs.getInt("happiness");
+
+            // Output the data to the browser console
+            %>
+            <script>
+                console.log("Gold: <%= gold %>");
+                console.log("Food: <%= food %>");
+                console.log("Soldiers: <%= soldiers %>");
+                console.log("Happiness: <%= happiness %>");
+            </script>
+            <%
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (pstmt != null) pstmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+%>
+
+<div class="resources">
+    <%-- Retrieve and display gold --%>
+    <p>Gold: <%= gold %></p>
+
+    <%-- Retrieve and display food --%>
+    <p>Food: <%= food %></p>
+
+    <%-- Retrieve and display soldier --%>
+    <p>Soldier: <%= soldiers %></p>
+
+    <%-- Retrieve and display happiness --%>
+    <p>Happiness: <%= happiness %></p>
+</div>
+
+<div class="announcement">
+    <p>Near the kingdom, a precious gold mine has been discovered. Local traders are proposing to develop the mine to extract gold. They suggest that the mine can yield valuable resources.</p>
+</div>
+
+<div class="buttons">
+    <button class="button">New Game</button>
+</div>
+
+</body>
+</html>
+
+

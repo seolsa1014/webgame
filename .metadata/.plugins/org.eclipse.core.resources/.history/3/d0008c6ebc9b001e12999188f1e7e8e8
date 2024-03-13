@@ -1,0 +1,45 @@
+<%@ page import="java.sql.*, java.io.*, java.util.*" %>
+<%@ page contentType="application/json;charset=UTF-8" language="java" %>
+
+<%
+    String name = request.getParameter("name");
+    JSONObject userInfo = new JSONObject();
+
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+        // Query to get user information
+        String query = "SELECT date, gold, food, soldiers, happiness FROM users WHERE name = ?";
+        stmt = conn.prepareStatement(query);
+        stmt.setString(1, name);
+        rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            userInfo.put("date", rs.getInt("date"));
+            userInfo.put("gold", rs.getInt("gold"));
+            userInfo.put("food", rs.getInt("food"));
+            userInfo.put("soldiers", rs.getInt("soldiers"));
+            userInfo.put("happiness", rs.getInt("happiness"));
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Send user information as JSON
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    response.getWriter().write(userInfo.toJSONString());
+%>

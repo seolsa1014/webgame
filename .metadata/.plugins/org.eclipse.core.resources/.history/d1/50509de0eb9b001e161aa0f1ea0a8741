@@ -1,0 +1,89 @@
+<%@ page import="java.sql.*, java.io.*, java.util.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Castle Page</title>
+    <link rel="stylesheet" type="text/css" href="css/day.css">
+    
+</head>
+<body>
+    
+    <div class="header">
+        <h1>Day</h1>
+    </div>
+
+    <%
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            // Establish database connection
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+            // Get name from local storage
+            String nameFromLocalStorage = (String) request.getAttribute("name");
+            if (nameFromLocalStorage == null || nameFromLocalStorage.isEmpty()) {
+                nameFromLocalStorage = (String) session.getAttribute("name");
+            }
+      
+            // Execute query to get data using name from local storage
+            String query = "SELECT gold, food, soldiers, happiness FROM your_table WHERE name = ?";
+            pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, nameFromLocalStorage);
+            rs = pstmt.executeQuery();
+
+            // Process the result set and set variables
+            if (rs.next()) {
+                int gold = rs.getInt("gold");
+                int food = rs.getInt("food");
+                int soldiers = rs.getInt("soldiers");
+                int happiness = rs.getInt("happiness");
+
+                // Set variables in page context
+                pageContext.setAttribute("gold", gold);
+                pageContext.setAttribute("food", food);
+                pageContext.setAttribute("soldiers", soldiers);
+                pageContext.setAttribute("happiness", happiness);
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    %>
+
+    <div class="resources">
+        <%-- Retrieve and display gold --%>
+        <p>Gold: <%= pageContext.getAttribute("gold") %></p>
+        
+        <%-- Retrieve and display food --%>
+        <p>Food: <%= pageContext.getAttribute("food") %></p>
+        
+        <%-- Retrieve and display soldier --%>
+        <p>Soldier: <%= pageContext.getAttribute("soldiers") %></p>
+        
+        <%-- Retrieve and display happiness --%>
+        <p>Happiness: <%= pageContext.getAttribute("happiness") %></p>
+    </div>
+
+    <div class="announcement">
+        <p>Near the kingdom, a precious gold mine has been discovered. Local traders are proposing to develop the mine to extract gold. They suggest that the mine can yield valuable resources.</p>
+    </div>
+
+    <div class="buttons">
+        <button class="button">New Game</button>
+    </div>
+
+</body>
+</html>
+
+

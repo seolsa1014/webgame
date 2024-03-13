@@ -1,0 +1,134 @@
+<%@ page import="java.sql.*, java.io.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Castle Page</title>
+    <link rel="stylesheet" type="text/css" href="css/day.css">
+    <script>
+        function redirectToPreviousPage() {
+            window.location.href = 'day12.jsp';
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 800px;
+            background: url('css/day13.png') center/100% 100% no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <%
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        // 데이터베이스 연결 정보
+        String jdbcUrl = "jdbc:mysql://localhost:3306/websitedb";
+        String dbUser = "root";
+        String dbPassword = "690505";
+
+        // gold, food, soldiers, happiness 변수 선언
+        int gold = 0;
+        int food = 0;
+        int soldiers = 0;
+        int happiness = 0;
+
+        try {
+            // JDBC 드라이버 로딩
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // 데이터베이스 연결
+            conn = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
+
+            // 로그인한 사용자의 이름 가져오기
+            String loggedInName = "";
+            String getLoginNameQuery = "SELECT name FROM login WHERE id = 1";
+            pstmt = conn.prepareStatement(getLoginNameQuery);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                loggedInName = rs.getString("name");
+            } else {
+                // 로그인 정보가 없으면 로그인 페이지로 이동
+                response.sendRedirect("login.jsp");
+                return;
+            }
+
+            // 사용자의 정보 가져오기 (gold, food, soldiers, happiness)
+            String getUserInfoQuery = "SELECT gold, food, soldiers, happiness FROM users WHERE name = ?";
+            pstmt = conn.prepareStatement(getUserInfoQuery);
+            pstmt.setString(1, loggedInName);
+            rs = pstmt.executeQuery();
+
+            // Process the result set and set variables
+            if (rs.next()) {
+                gold = rs.getInt("gold");
+                food = rs.getInt("food");
+                soldiers = rs.getInt("soldiers");
+                happiness = rs.getInt("happiness");
+            }
+
+            // 선택지에 따라 데이터베이스 업데이트
+            String selectedOption = request.getParameter("option");
+            if ("option1".equals(selectedOption)) {
+                // 옵션 1: Sell the grain / -5 Food, +10 Gold
+                // 자원 부족 시 경고 처리
+                if (food >= 5) {
+                    // 데이터베이스 업데이트
+                    String updateQuery = "UPDATE users SET gold = gold + 10, food = food - 5, date = date + 1 WHERE name = ?";
+                    pstmt = conn.prepareStatement(updateQuery);
+                    pstmt.setString(1, loggedInName);
+                    pstmt.executeUpdate();
+                } else {
+                    // 자원 부족 시 경고창을 띄우고 이전 페이지로 이동
+                    out.println("<script>alert('Not enough resources!');</script>");
+                    out.println("<script>window.location.href='next13.jsp';</script>");
+                    return;
+                }
+            } else if ("option2".equals(selectedOption)) {
+                // 옵션 2: Distribute grain to the people / -5 Food, +1 happiness
+                // 자원 부족 시 경고 처리
+                if (food >= 5) {
+                    // 데이터베이스 업데이트
+                    String updateQuery = "UPDATE users SET food = food - 5, happiness = happiness + 1, date = date + 1 WHERE name = ?";
+                    pstmt = conn.prepareStatement(updateQuery);
+                    pstmt.setString(1, loggedInName);
+                    pstmt.executeUpdate();
+                } else {
+                    // 자원 부족 시 경고창을 띄우고 이전 페이지로 이동
+                    out.println("<script>alert('Not enough resources!');</script>");
+                    out.println("<script>window.location.href='next13.jsp';</script>");
+                    return;
+                }
+            } else if ("option3".equals(selectedOption)) {
+                // 옵션 3: Do nothing (아무런 업데이트 없음)
+                // 데이터베이스 업데이트
+                String updateQuery = "UPDATE users SET date = date + 1 WHERE name = ?";
+                pstmt = conn.prepareStatement(updateQuery);
+                pstmt.setString(1, loggedInName);
+                pstmt.executeUpdate();
+            }
+
+            // 다음 페이지로 리다이렉트
+            String nextPage = "next" + (date + 1) + ".jsp";
+            response.sendRedirect(nextPage);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    %>
+</body>
+</html>
+
+

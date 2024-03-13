@@ -1,0 +1,41 @@
+// If name exists, retrieve name and sequence
+if (exists) {
+    // Retrieve name and sequence from the users table
+    String retrieveQuery = "SELECT name, sequence FROM users WHERE name = ?";
+    try (PreparedStatement retrieveStmt = conn.prepareStatement(retrieveQuery)) {
+        retrieveStmt.setString(1, name);
+        try (ResultSet retrieveResultSet = retrieveStmt.executeQuery()) {
+            if (retrieveResultSet.next()) {
+                retrievedName = retrieveResultSet.getString("name");
+                retrievedSequence = retrieveResultSet.getString("sequence");
+            }
+        }
+    }
+
+    // Store name and sequence in local storage or perform other actions as needed
+
+    // Update the name in the login table or insert a new row if it doesn't exist
+    String updateQuery = "INSERT INTO login (name) VALUES (?) ON DUPLICATE KEY UPDATE name = ?";
+    try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
+        updateStmt.setString(1, name);
+        updateStmt.setString(2, name);
+        updateStmt.executeUpdate();
+    }
+
+    // Redirect to lobby.jsp
+    %>
+    <script>
+        window.location.href = 'lobby.jsp';
+    </script>
+    <%
+} else {
+    // Name doesn't exist, display a message or perform additional actions
+    %>
+    <script>
+        alert('Name does not exist. Please try again.');
+        window.location.href = 'load.jsp';
+    </script>
+    <%
+}
+
+

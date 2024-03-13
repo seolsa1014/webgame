@@ -1,0 +1,74 @@
+<%@ page import="java.sql.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.io.*,java.util.*" %>
+<%@ page import="org.json.simple.parser.JSONParser" %>
+<%@ page import="org.json.simple.parser.ParseException" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+<%
+    Connection conn = null;
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+        // Get data from local storage
+        String name = request.getParameter("name");
+        String sequenceString = request.getParameter("sequence");
+
+        // Check if the name already exists
+        String checkQuery = "SELECT COUNT(*) FROM users WHERE name = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+            checkStmt.setString(1, name);
+            try (ResultSet resultSet = checkStmt.executeQuery()) {
+                resultSet.next();
+                int count = resultSet.getInt(1);
+                if (count > 0) {
+                    // Name already exists, show a warning message
+%>
+                    <script>
+                        alert("Name already exists. Please choose a different name.");
+                        window.location.href = 'newgame.jsp';
+                    </script>
+<%
+                    return;
+                }
+            }
+        }
+
+        // Database connection and insertion
+        String insertQuery = "INSERT INTO users (name, sequence, date, gold, food, soldiers, happiness, ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) VALUES (?, ?, 1, 15, 15, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+        try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, sequenceString); // Set JSON string directly
+            pstmt.executeUpdate();
+        }
+
+        // Redirect to lobby.jsp
+        response.sendRedirect("lobby.jsp");
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error processing the request", e);
+    } finally {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+%>
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,72 @@
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Random;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.json.simple.JSONArray;
+
+@WebServlet("/createAccount")
+public class CreateAccountServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    // MySQL 연결 정보
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/websitedb";
+    private static final String JDBC_USER = "root";
+    private static final String JDBC_PASSWORD = "690505";
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String name = request.getParameter("name");
+
+        // Generate a random sequence array
+        JSONArray sequenceArray = generateRandomSequenceArray();
+
+        // Database connection and insertion
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+
+            String insertQuery = "INSERT INTO users (name, sequence, date, gold, food, soldiers, happiness, ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) VALUES (?, ?, 1, 15, 15, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+                pstmt.setString(1, name);
+                pstmt.setString(2, sequenceArray.toJSONString());
+                pstmt.executeUpdate();
+            }
+
+            conn.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Redirect to the next page (replace "nextPage.jsp" with the actual next page)
+        response.sendRedirect("nextPage.jsp");
+    }
+
+    private JSONArray generateRandomSequenceArray() {
+        JSONArray sequenceArray = new JSONArray();
+        ArrayList<Integer> sequenceList = new ArrayList<>();
+
+        // Generate a list of numbers from 1 to 30
+        for (int i = 1; i <= 30; i++) {
+            sequenceList.add(i);
+        }
+
+        // Shuffle the list
+        Random rand = new Random();
+        for (int i = 0; i < 30; i++) {
+            int randomIndex = rand.nextInt(sequenceList.size());
+            sequenceArray.add(sequenceList.remove(randomIndex));
+        }
+
+        return sequenceArray;
+    }
+}
+

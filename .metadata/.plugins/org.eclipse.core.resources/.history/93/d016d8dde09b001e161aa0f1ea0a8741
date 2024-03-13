@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script>
+        function goToMain() {
+            window.location.href = 'main.html';
+        }
+
+        function goToday() {
+            // 직접 서버 측 코드를 실행
+            <%@ page import="java.sql.*, java.io.*, java.util.*, org.json.simple.*" %>
+            <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+            <%
+                String name = request.getParameter("name");
+                boolean exists = false;
+                String retrievedName = "";
+                String retrievedSequence = "";
+
+                Connection conn = null;
+                PreparedStatement checkStmt = null;
+                ResultSet resultSet = null;
+
+                try {
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+                    // Check if the name already exists
+                    String checkQuery = "SELECT COUNT(*) FROM users WHERE name = ?";
+                    checkStmt = conn.prepareStatement(checkQuery);
+                    checkStmt.setString(1, name);
+                    resultSet = checkStmt.executeQuery();
+
+                    if (resultSet.next()) {
+                        int count = resultSet.getInt(1);
+                        exists = count > 0;
+
+                        // If name exists, retrieve name and sequence
+                        if (exists) {
+                            // Get the sequence from the database
+                            String retrieveQuery = "SELECT sequence FROM users WHERE name = ?";
+                            try (PreparedStatement retrieveStmt = conn.prepareStatement(retrieveQuery)) {
+                                retrieveStmt.setString(1, name);
+                                try (ResultSet retrieveResultSet = retrieveStmt.executeQuery()) {
+                                    if (retrieveResultSet.next()) {
+                                        retrievedSequence = retrieveResultSet.getString("sequence");
+                                    }
+                                }
+                            }
+
+                            // Parse the JSON sequence
+                            JSONParser parser = new JSONParser();
+                            JSONObject sequenceJson = (JSONObject) parser.parse(retrievedSequence);
+
+                            // Get the current date
+                            int date = 1;  // You need to set the appropriate value for the date
+
+                            // Get the value from the JSON sequence based on the date
+                            long value = (long) sequenceJson.get(String.valueOf(date - 1));
+
+                            // Redirect to the appropriate day page
+                            String nextPage = "day" + value + ".jsp";
+                            response.sendRedirect(nextPage);
+                        } else {
+                            // Name doesn't exist, display a message or perform additional actions
+                            %>
+                            alert('Name does not exist. Please try again.');
+                            window.location.href = 'load.jsp';
+                            <%
+                        }
+                    }
+                } catch (ClassNotFoundException | SQLException | ParseException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (resultSet != null) resultSet.close();
+                        if (checkStmt != null) checkStmt.close();
+                        if (conn != null) conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            %>
+        }
+    </script>
+</head>
+<body>
+    <div class="title">
+        <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+    </div>
+
+    <div class="buttons">
+        <button class="button" onclick="goToday()">Continue</button>
+        <button class="button">Achievement</button>
+        <button class="button" onclick="goToMain()">Back</button>
+    </div>
+</body>
+</html>

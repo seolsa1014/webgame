@@ -1,0 +1,53 @@
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Random" %>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.io.*,java.util.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+<%
+    if ("POST".equals(request.getMethod())) {
+        String name = request.getParameter("name");
+
+        // Generate a random sequence array
+        JSONArray sequenceArray = generateRandomSequenceArray();
+
+        // Database connection and insertion
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+            String insertQuery = "INSERT INTO users (name, sequence, date, gold, food, soldiers, happiness, ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) VALUES (?, ?, 1, 15, 15, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+
+            try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+                pstmt.setString(1, name);
+                pstmt.setString(2, sequenceArray.toJSONString());
+                pstmt.executeUpdate();
+            }
+
+            conn.close();
+
+            response.sendRedirect("lobby.jsp");
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Java 코드를 JSP 내에서 사용하면서 HTML 코드와 혼용
+%>
+
+<%
+    // Java 코드를 JSP 내에서 사용하면서 HTML 코드와 혼용
+%>
+
+</body>
+</html>
+

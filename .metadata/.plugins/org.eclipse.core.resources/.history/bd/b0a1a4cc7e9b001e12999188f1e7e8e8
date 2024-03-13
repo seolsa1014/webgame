@@ -1,0 +1,89 @@
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Random" %>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page import="java.io.*,java.util.*" %>
+<%@ page import="java.sql.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+<%
+    // ...
+
+    // Define the method directly inside a scriptlet
+    JSONArray generateRandomSequenceArray() {
+        JSONArray sequenceArray = new JSONArray();
+        ArrayList<Integer> sequenceList = new ArrayList<>();
+
+        // Generate a list of numbers from 1 to 30
+        for (int i = 1; i <= 30; i++) {
+            sequenceList.add(i);
+        }
+
+        // Shuffle the list
+        Random rand = new Random();
+        for (int i = 0; i < 30; i++) {
+            int randomIndex = rand.nextInt(sequenceList.size());
+            sequenceArray.add(sequenceList.remove(randomIndex));
+        }
+
+        return sequenceArray;
+    }
+
+    // ...
+%>
+
+<div class="title">
+    <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+</div>
+
+<div class="buttons">
+    <form method="post" action="createAccount.jsp">
+        <div class="field">
+            <b>Name</b><br>
+            <span class="placehold-text"><input type="text" name="name" required></span>
+        </div>
+
+        <button type="submit" class="button">Submit</button>
+        <button type="button" class="button" onclick="goToMain()">Back</button>
+    </form>
+</div>
+
+<%
+    // Database connection and insertion
+    String name = request.getParameter("name");
+
+    JSONArray sequenceArray = generateRandomSequenceArray();
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+
+        String insertQuery = "INSERT INTO users (name, sequence, date, gold, food, soldiers, happiness, ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) VALUES (?, ?, 1, 15, 15, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, sequenceArray.toJSONString());
+            pstmt.executeUpdate();
+        }
+
+        conn.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    }
+
+    // Redirect to the next page (replace "nextPage.jsp" with the actual next page)
+    response.sendRedirect("lobby.jsp");
+%>
+
+</body>
+</html>
+
+

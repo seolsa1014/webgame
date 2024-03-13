@@ -1,0 +1,78 @@
+<%@ page import="java.sql.*, java.io.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="org.json.simple.parser.JSONParser" %>
+<%@ page import="org.json.simple.parser.ParseException" %>
+
+<%
+    String name = request.getParameter("name");
+    boolean exists = false;
+
+    Connection conn = null;
+    PreparedStatement checkStmt = null;
+    ResultSet resultSet = null;
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+
+        // Check if the name already exists
+        String checkQuery = "SELECT COUNT(*) FROM users WHERE name = ?";
+        checkStmt = conn.prepareStatement(checkQuery);
+        checkStmt.setString(1, name);
+        resultSet = checkStmt.executeQuery();
+
+        if (resultSet.next()) {
+            int count = resultSet.getInt(1);
+            exists = count > 0;
+
+            // If name exists, retrieve and store name and sequence in local storage
+            if (exists) {
+                String retrieveQuery = "SELECT name, sequence FROM users WHERE name = ?";
+                try (PreparedStatement retrieveStmt = conn.prepareStatement(retrieveQuery)) {
+                    retrieveStmt.setString(1, name);
+                    try (ResultSet retrieveResultSet = retrieveStmt.executeQuery()) {
+                        if (retrieveResultSet.next()) {
+                            String retrievedName = retrieveResultSet.getString("name");
+                            String retrievedSequence = retrieveResultSet.getString("sequence");
+
+                            // Output retrieved values to console for debugging
+                            out.println("<script>");
+                            out.println("console.log('Retrieved Name: " + retrievedName + "');");
+                            out.println("console.log('Retrieved Sequence: " + retrievedSequence + "');");
+                            out.println("</script>");
+
+                            // Store name and sequence in local storage
+                            out.println("<script>");
+                            out.println("localStorage.setItem('name', '" + retrievedName + "');");
+                            out.println("localStorage.setItem('sequence', '" + retrievedSequence + "');");
+                            out.println("</script>");
+                        }
+                    }
+                }
+            }
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (resultSet != null) resultSet.close();
+            if (checkStmt != null) checkStmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Check the result and perform redirection or display a message
+    if (exists) {
+        // Name exists, redirect to lobby.jsp
+         response.sendRedirect("lobby.jsp");
+    } else {
+        // Name doesn't exist, display a message or perform additional actions
+        out.println("<script>");
+        out.println("alert('Name does not exist. Please try again.');");
+        out.println("window.location.href = 'load.jsp';");
+        out.println("</script>");
+    }
+%>
+

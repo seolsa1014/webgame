@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+    <div class="title">
+        <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+    </div>
+
+    <div class="buttons">
+        <button class="button">Continue</button>
+        <button class="button">Achievement</button>
+        <button class="button">Back</button>
+    </div>
+
+</body>
+</html>

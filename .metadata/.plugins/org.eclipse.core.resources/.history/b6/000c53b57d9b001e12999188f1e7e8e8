@@ -1,0 +1,12 @@
+function goToMain() {
+    window.location.href = 'main.jsp';
+}
+
+function validateForm() {
+    var name = document.forms[0].elements["name"].value;
+    if (name.trim() === "") {
+        alert("이름을 입력하세요");
+        return false;
+    }
+    return true;
+}

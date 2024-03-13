@@ -1,0 +1,58 @@
+<%@ page import="java.sql.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.io.*,java.util.*" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+        <script>
+        function goToMain() {
+            window.location.href = 'main.jsp';
+        }
+    </script>
+</head>
+<body>
+ <div class="title">
+        <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+    </div>
+    <div class="buttons" style = "margin = 5px">
+<%
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/websitedb", "root", "690505");
+        stmt = conn.createStatement();
+
+        // Query to get all names from the users table
+        String query = "SELECT name FROM users";
+        rs = stmt.executeQuery(query);
+
+        // Display the names as buttons
+        while (rs.next()) {
+            String name = rs.getString("name");
+%>
+            <button class="button"><%= name %></button><br>
+<%
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+%>
+<button class="button" onclick="goToMain()">Back</button>
+</div>
+</body>
+</html>

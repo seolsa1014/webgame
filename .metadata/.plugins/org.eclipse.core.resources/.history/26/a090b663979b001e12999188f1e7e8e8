@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kingdom Survive</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+    
+    <div class="title">
+        <h1>Kingdom&nbsp;&nbsp;Survive</h1>
+    </div>
+
+    <div class="buttons">
+        <button class="button" onclick="startNewGame()">New Game</button>
+        <button class="button">Load</button>
+        <button class="button" onclick="goToHowToPlay()">How to play</button>
+    </div>
+
+    <script>
+        function startNewGame() {
+            window.location.href = 'newgame.jsp';
+        }
+
+        function goToHowToPlay() {
+            window.location.href = 'howtoplay.jsp';
+        }
+        function goToHowToPlay() {
+            window.location.href = 'howtoplay.jsp';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+C:\Users\seols\OneDrive\바탕 화면\웹프실 파이널\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+1888354257.index
+3159472307.index
+3181951865.index
+1189727113.index
+1051715974.index
+732683324.index
